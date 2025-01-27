@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:age_calculator/date_details_row_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'date_box_widget.dart';
 import 'next_birthday_row_item_widget.dart';
@@ -21,8 +22,25 @@ class _AgeCalculatorPageState extends State<AgeCalculatorPage> {
   int totalMonths = 0;
   int totalDays = 0;
 
+  String _monthsOld = '';
+  String _weeksOld = '';
+  String _daysOld = '';
+  String _hoursOld = '';
+  String _minutesOld = '';
+  String _secondsOld = '';
+  String _nextBirthdayMonths = '';
+  String _nextBirthdayDays = '';
+
+  @override
+  void initState() {
+    super.initState();
+    debugPrint("Inside initState AgeCalculatorPage");
+  }
+
   @override
   Widget build(BuildContext context) {
+    debugPrint("Inside build AgeCalculatorPage");
+
     return Scaffold(
       backgroundColor: const Color(0xFFEAEAEC),
       body: SafeArea(
@@ -133,12 +151,30 @@ class _AgeCalculatorPageState extends State<AgeCalculatorPage> {
                         height: 40.0,
                       ),
                     ),
-                    const DateDetailsRowItem(),
-                    const DateDetailsRowItem(),
-                    const DateDetailsRowItem(),
-                    const DateDetailsRowItem(),
-                    const DateDetailsRowItem(),
-                    const DateDetailsRowItem(),
+                    DateDetailsRowItem(
+                      label: "Months Old",
+                      value: _monthsOld,
+                    ),
+                    DateDetailsRowItem(
+                      label: "Weeks Old",
+                      value: _weeksOld,
+                    ),
+                    DateDetailsRowItem(
+                      label: "days Old",
+                      value: _daysOld,
+                    ),
+                    DateDetailsRowItem(
+                      label: "Hours Old(approx)",
+                      value: _hoursOld,
+                    ),
+                    DateDetailsRowItem(
+                      label: "Minutes Old(approx)",
+                      value: _minutesOld,
+                    ),
+                    DateDetailsRowItem(
+                      label: "Seconds Old(approx)",
+                      value: _secondsOld,
+                    ),
                     const SizedBox(
                       height: 20.0,
                     ),
@@ -159,27 +195,29 @@ class _AgeCalculatorPageState extends State<AgeCalculatorPage> {
                   child: Row(
                     children: [
                       // NEXT BIRTHDAY
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             'Next Birthday',
                             style: TextStyle(
                                 fontWeight: FontWeight.w800, fontSize: 18.0),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10.0,
                           ),
                           Row(
                             children: [
                               NextBirthdayRowItemWidget(
                                 calendarLabel: "Months",
+                                value: _nextBirthdayMonths,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 20.0,
                               ),
                               NextBirthdayRowItemWidget(
                                 calendarLabel: "Days",
+                                value: _nextBirthdayDays,
                               ),
                             ],
                           )
@@ -249,10 +287,15 @@ class _AgeCalculatorPageState extends State<AgeCalculatorPage> {
           return Container(
             height: 250,
             child: CupertinoDatePicker(
+                mode: CupertinoDatePickerMode.date,
                 initialDateTime: DateTime.now(),
                 maximumDate: DateTime.now(),
                 onDateTimeChanged: (DateTime newDate) {
-                  _birthdayController.text = newDate.toString();
+                  final DateFormat formatter = DateFormat('yyyy/MM/dd');
+                  final String formatted = formatter.format(newDate);
+
+                  debugPrint(formatted);
+                  _birthdayController.text = formatted;
                   calculateAge(newDate);
                 }),
           );
@@ -267,11 +310,43 @@ class _AgeCalculatorPageState extends State<AgeCalculatorPage> {
   }
 
   void calculateAge(DateTime birthdate) {
-    _birthdayController.text = birthdate.toString();
-    debugPrint(birthdate.toString());
+    DateTime now = DateTime.now();
+    Duration difference = now.difference(birthdate);
 
-    totalYears = DateTime.now().year - birthdate.year;
-    totalMonths = DateTime.now().month - birthdate.month;
+    // Calculate age in years, months, and days
+    totalYears = difference.inDays ~/ 365;
+    totalMonths = (difference.inDays % 365) ~/ 30;
+    totalDays = (difference.inDays % 365) % 30;
+
+    // Calculate age in months
+    _monthsOld = '${difference.inDays ~/ 30}';
+
+    // Calculate age in weeks
+    _weeksOld = '${difference.inDays ~/ 7}';
+
+    // Calculate age in days
+    _daysOld = '${difference.inDays}';
+
+    // Calculate age in hours
+    _hoursOld = '${difference.inHours}';
+
+    // Calculate age in minutes
+    _minutesOld = '${difference.inMinutes}';
+
+    // Calculate age in seconds
+    _secondsOld = '${difference.inSeconds}';
+
+    // Calculate next birthday
+    DateTime nextBirthday = DateTime(
+        birthdate.year + totalYears + 1, birthdate.month, birthdate.day);
+    Duration untilNextBirthday = nextBirthday.difference(now);
+
+    // Calculate months and days until next birthday
+    int nextBirthdayMonths = untilNextBirthday.inDays ~/ 30;
+    int nextBirthdayDays = untilNextBirthday.inDays % 30;
+
+    _nextBirthdayMonths = "$nextBirthdayMonths";
+    _nextBirthdayDays = "$nextBirthdayDays";
     setState(() {});
   }
 }
