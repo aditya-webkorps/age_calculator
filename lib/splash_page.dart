@@ -1,6 +1,9 @@
 import 'package:age_calculator/age_calculator_page.dart';
 import 'package:flutter/material.dart';
 
+import 'login_page.dart';
+import 'shared_preferences_service.dart';
+
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
@@ -9,19 +12,40 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+  SharedPreferencesService prefService = SharedPreferencesService();
+
+  Future<void> initSharedPref() async {
+    await prefService.initSharedPref();
+  }
+
   @override
   void initState() {
     super.initState();
-
+    initSharedPref();
     debugPrint("Inside initState");
 
     Future.delayed(const Duration(milliseconds: 3 * 1000), () {
+      getLocalData();
+    });
+  }
+
+  void getLocalData() {
+    bool? isUserLoggedIn = prefService.getPrefBool(
+        prefKey: SharedPreferencesService.kIsUserLoggedIn);
+
+    if (isUserLoggedIn == true) {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => const AgeCalculatorPage(),
           ));
-    });
+    } else {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LoginPage(),
+          ));
+    }
   }
 
   @override

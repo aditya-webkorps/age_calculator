@@ -248,7 +248,7 @@ class _AgeCalculatorPageState extends State<AgeCalculatorPage> {
                     ],
                   ),
                 ),
-              )
+              ),
             ]),
           ),
         ),

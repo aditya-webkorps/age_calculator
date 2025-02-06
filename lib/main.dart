@@ -1,9 +1,12 @@
+import 'package:age_calculator/lifecycle_methods_demo.dart';
 import 'package:age_calculator/splash_page.dart';
 import 'package:flutter/material.dart';
+// import 'package:age_calculator/services/shared_pref_service.dart';
 
 import 'age_calculator_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
